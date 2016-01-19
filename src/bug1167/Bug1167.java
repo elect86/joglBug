@@ -89,16 +89,19 @@ public class Bug1167 implements GLEventListener {
 
             for (int k = 0; k < SQRT_BUILDING_COUNT; k++) {
 
-                gl4.glCreateBuffers(2, vertexBuffer, 0);
+                gl4.glCreateBuffers(1, vertexBuffer, 0);
+//                gl4.glGenBuffers(1, vertexBuffer, 0);
+//                gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[0]);
 
-                gl4.glCreateBuffers(1, indexBuffer, 0);
+//                gl4.glCreateBuffers(1, indexBuffer, 0);
 
                 // Stick the data for the vertices and indices in their respective buffers
                 ByteBuffer verticesBuffer = GLBuffers.newDirectByteBuffer(512);
                 gl4.glNamedBufferData(vertexBuffer[0], verticesBuffer.capacity(), verticesBuffer.rewind(), GL_STATIC_DRAW);
+//                gl4.glBufferData(GL_ARRAY_BUFFER, verticesBuffer.capacity(), verticesBuffer, GL_STATIC_DRAW);
 
-                ShortBuffer indicesBuffer = GLBuffers.newDirectShortBuffer(6);
-                gl4.glNamedBufferData(indexBuffer[0], indicesBuffer.capacity(), indicesBuffer, GL_STATIC_DRAW);
+//                ShortBuffer indicesBuffer = GLBuffers.newDirectShortBuffer(6);
+//                gl4.glNamedBufferData(indexBuffer[0], indicesBuffer.capacity(), indicesBuffer, GL_STATIC_DRAW);
 
                 // *** INTERESTING ***
                 // get the GPU pointer for the vertex buffer and make the vertex buffer resident on the GPU
@@ -110,11 +113,11 @@ public class Bug1167 implements GLEventListener {
 
                 // *** INTERESTING ***
                 // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
-                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
-                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr, 0);
-                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize, 0);
-                gl4.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+//                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
+//                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr, 0);
+//                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize, 0);
+//                gl4.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+//                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
         }
     }
