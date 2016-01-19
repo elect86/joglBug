@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package joglbug;
+package bug1283;
 
 import com.jogamp.nativewindow.util.Dimension;
 import com.jogamp.newt.Display;
@@ -21,7 +21,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
 
-public class JoglBug implements GLEventListener {
+public class Bug1283 implements GLEventListener {
 
     private static int screenIdx = 0;
     private static Dimension windowSize = new Dimension(1024, 768);
@@ -50,7 +50,7 @@ public class JoglBug implements GLEventListener {
         glWindow.confinePointer(mouseConfined);
         glWindow.setVisible(true);
 
-        JoglBug joglBug = new JoglBug();
+        Bug1283 joglBug = new Bug1283();
         glWindow.addGLEventListener(joglBug);
 
         animator = new Animator(glWindow);
@@ -58,9 +58,9 @@ public class JoglBug implements GLEventListener {
     }
 
     private int program;
-    private final String SHADERS_ROOT = "/shaders";
+    private final String SHADERS_ROOT = "/bug1283/shaders";
 
-    public JoglBug() {
+    public Bug1283() {
 
     }
 
