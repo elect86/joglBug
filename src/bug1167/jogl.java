@@ -76,8 +76,10 @@ public class jogl implements GLEventListener, KeyListener {
     private int[] building = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT * 2];
     private int[] vertexBuffer = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT],
             indexBuffer = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT],
-            vertexBufferSize = {0}, indexBufferSize = {0};
-    private long[] vertexBufferGPUPtr = {0}, indexBufferGPUPtr = {0};
+            vertexBufferSize = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT], 
+            indexBufferSize = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT];
+    private long[] vertexBufferGPUPtr = new long[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT], 
+            indexBufferGPUPtr = new long[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT];
     private boolean bug = false;
     private boolean toggle = false;
 
@@ -118,15 +120,16 @@ public class jogl implements GLEventListener, KeyListener {
                 // *** INTERESTING ***
                 // get the GPU pointer for the vertex buffer and make the vertex buffer resident on the GPU
                 gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[index]);
-                gl4.glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, vertexBufferGPUPtr, 0);
-                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize, 0);
+                gl4.glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, vertexBufferGPUPtr, index);
+                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize, index);
                 gl4.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
                 gl4.glBindBuffer(GL_ARRAY_BUFFER, 0);
 //                // *** INTERESTING ***
                 // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
                 gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[index]);
-                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr, 0);
-                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize, 0);
+                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr, 
+                        index);
+                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize, index);
                 gl4.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
                 gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
