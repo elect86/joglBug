@@ -27,6 +27,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 
 /**
@@ -68,20 +70,20 @@ public class jogl implements GLEventListener, KeyListener {
 
         animator = new Animator(glWindow);
         animator.setRunAsFastAsPossible(true);
-        animator.setUpdateFPSFrames(1000, System.out);
+        animator.setUpdateFPSFrames(100, System.out);
         animator.start();
     }
 
     private int SQRT_BUILDING_COUNT = 100;
-    private int[] building = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT * 2];
-    private int[] vertexBuffer = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT],
-            indexBuffer = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT],
-            vertexBufferSize = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT], 
-            indexBufferSize = new int[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT];
-    private long[] vertexBufferGPUPtr = new long[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT], 
-            indexBufferGPUPtr = new long[SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT];
+    private IntBuffer vertexBuffer = GLBuffers.newDirectIntBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT),
+            indexBuffer = GLBuffers.newDirectIntBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT),
+            vertexBufferSize = GLBuffers.newDirectIntBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT),
+            indexBufferSize = GLBuffers.newDirectIntBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT);
+    private LongBuffer vertexBufferGPUPtr = GLBuffers.newDirectLongBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT),
+            indexBufferGPUPtr = GLBuffers.newDirectLongBuffer(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT);
     private boolean bug = false;
     private boolean toggle = false;
+    private boolean dsa = false;
 
     public jogl() {
 
@@ -93,47 +95,56 @@ public class jogl implements GLEventListener, KeyListener {
 
         GL4 gl4 = drawable.getGL().getGL4();
 
-        gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, vertexBuffer, 0);
-        gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, indexBuffer, 0);
-        
+        gl4.setSwapInterval(0);
+
+        gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, vertexBuffer);
+//        gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, indexBuffer);
+
         for (int i = 0; i < SQRT_BUILDING_COUNT; i++) {
 
             for (int k = 0; k < SQRT_BUILDING_COUNT; k++) {
 
                 int index = i * SQRT_BUILDING_COUNT + k;
-                
-//                gl4.glCreateBuffers(1, vertexBuffer, index);
-//
-//                gl4.glCreateBuffers(1, indexBuffer, index);
 
+//                gl4.glCreateBuffers(1, vertexBuffer, index);
+//                gl4.glCreateBuffers(1, indexBuffer, index);
                 // Stick the data for the vertices and indices in their respective buffers
                 ByteBuffer verticesBuffer = GLBuffers.newDirectByteBuffer(512);
+                if (dsa) {
+                    gl4.glNamedBufferData(vertexBuffer.get(index), verticesBuffer.capacity() * Byte.BYTES, verticesBuffer,
+                            GL_STATIC_DRAW);
+                } else {
+                    gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.get(index));
+                    gl4.glBufferData(GL_ARRAY_BUFFER, verticesBuffer.capacity() * Byte.BYTES, verticesBuffer, 
+                            GL_STATIC_DRAW);
+                }
 
-                gl4.glNamedBufferData(vertexBuffer[index], verticesBuffer.capacity() * Byte.BYTES,
-                        verticesBuffer.rewind(), GL_STATIC_DRAW);
-//                gl4.glBufferData(GL_ARRAY_BUFFER, verticesBuffer.capacity(), verticesBuffer, GL_STATIC_DRAW);
-
-                ShortBuffer indicesBuffer = GLBuffers.newDirectShortBuffer(6);
-                gl4.glNamedBufferData(indexBuffer[index], indicesBuffer.capacity() * Short.BYTES, indicesBuffer,
-                        GL_STATIC_DRAW);
+//                ShortBuffer indicesBuffer = GLBuffers.newDirectShortBuffer(6);
+//                gl4.glNamedBufferData(indexBuffer.get(index), indicesBuffer.capacity() * Short.BYTES, indicesBuffer,
+//                        GL_STATIC_DRAW);
 
                 // *** INTERESTING ***
                 // get the GPU pointer for the vertex buffer and make the vertex buffer resident on the GPU
-                gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer[index]);
-                gl4.glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, vertexBufferGPUPtr, index);
-                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize, index);
-                gl4.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
+                gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.get(index));
+                vertexBufferGPUPtr.position(index);
+                gl4.glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, vertexBufferGPUPtr);
+//                vertexBufferSize.position(index);
+//                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize);
+//                gl4.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
                 gl4.glBindBuffer(GL_ARRAY_BUFFER, 0);
-//                // *** INTERESTING ***
-                // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
-                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer[index]);
-                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr, 
-                        index);
-                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize, index);
-                gl4.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+////                // *** INTERESTING ***
+//                // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
+//                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.get(index));
+//                indexBufferGPUPtr.position(index);
+//                gl4.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr);
+//                indexBufferSize.position(index);
+//                gl4.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize);
+//                gl4.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+//                gl4.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
         }
+        vertexBufferGPUPtr.rewind();
+//        indexBufferGPUPtr.rewind();
     }
 
     @Override
@@ -142,7 +153,7 @@ public class jogl implements GLEventListener, KeyListener {
     }
 
     private float[] clearColor = new float[]{1.0f, 0.5f, 0.0f, 1.0f};
-    
+
     @Override
     public void display(GLAutoDrawable drawable) {
         GL4 gl4 = drawable.getGL().getGL4();
