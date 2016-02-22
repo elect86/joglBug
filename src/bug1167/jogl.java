@@ -12,17 +12,21 @@ import com.jogamp.newt.Screen;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import com.jogamp.newt.opengl.GLWindow;
+import com.jogamp.opengl.GL;
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_BUFFER_SIZE;
 import static com.jogamp.opengl.GL.GL_ELEMENT_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
+import com.jogamp.opengl.GL2;
 import static com.jogamp.opengl.GL2ES3.GL_COLOR;
 import static com.jogamp.opengl.GL2ES3.GL_READ_ONLY;
 import static com.jogamp.opengl.GL2GL3.GL_BUFFER_GPU_ADDRESS_NV;
 import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLES3;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLExtensions;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
@@ -95,7 +99,8 @@ public class jogl implements GLEventListener, KeyListener {
         GL4 gl4 = drawable.getGL().getGL4();
 
         gl4.setSwapInterval(0);
-
+        int a = GL2.GL_DRAW_ELEMENTS_COMMAND_NV;
+        
         gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, vertexBuffer);
 //        gl4.glCreateBuffers(SQRT_BUILDING_COUNT * SQRT_BUILDING_COUNT, indexBuffer);
 
