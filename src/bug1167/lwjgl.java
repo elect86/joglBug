@@ -107,7 +107,7 @@ public class lwjgl {
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
         // Enable v-sync
-//        glfwSwapInterval(1);
+        glfwSwapInterval(0);
 
         // Make the window visible
         glfwShowWindow(window);
@@ -137,7 +137,7 @@ public class lwjgl {
             for (int k = 0; k < SQRT_BUILDING_COUNT; k++) {
 
                 int index = (i * SQRT_BUILDING_COUNT + k) * Integer.BYTES;
-                
+
                 vertexBuffer.position(index);
                 GL45.glCreateBuffers(1, vertexBuffer);
 
@@ -145,13 +145,11 @@ public class lwjgl {
                 GL45.glCreateBuffers(1, indexBuffer);
 
                 // Stick the data for the vertices and indices in their respective buffers
-                ByteBuffer verticesBuffer = BufferUtils.createByteBuffer(512 * 6);
-
+                ByteBuffer verticesBuffer = BufferUtils.createByteBuffer(512 * Byte.BYTES);
                 GL45.glNamedBufferData(vertexBuffer.getInt(index), verticesBuffer.capacity() * Byte.BYTES,
                         verticesBuffer, GL_STATIC_DRAW);
-//                gl4.glBufferData(GL_ARRAY_BUFFER, verticesBuffer.capacity(), verticesBuffer, GL_STATIC_DRAW);
-
-                ByteBuffer indicesBuffer = BufferUtils.createByteBuffer(6 * 6 * Short.BYTES);
+                
+                ByteBuffer indicesBuffer = BufferUtils.createByteBuffer(6 * Short.BYTES);
                 GL45.glNamedBufferData(indexBuffer.getInt(index), indicesBuffer.capacity() * Byte.BYTES,
                         indicesBuffer, GL_STATIC_DRAW);
 
@@ -163,21 +161,20 @@ public class lwjgl {
                 GL15.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize);
                 NVShaderBufferLoad.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
                 GL15.glBindBuffer(GL_ARRAY_BUFFER, 0);
-//                // *** INTERESTING ***
+                // *** INTERESTING ***
                 // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
                 GL15.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.getInt(index));
-                NVShaderBufferLoad.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV,
-                        indexBufferGPUPtr);
+                NVShaderBufferLoad.glGetBufferParameterui64vNV(GL_ELEMENT_ARRAY_BUFFER,
+                        GL_BUFFER_GPU_ADDRESS_NV, indexBufferGPUPtr);
                 GL15.glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, indexBufferSize);
                 NVShaderBufferLoad.glMakeBufferResidentNV(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
                 GL15.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
         }
-        
+
 //        for (int i = 0; i < SQRT_BUILDING_COUNT*SQRT_BUILDING_COUNT; i++) {
 //            System.out.println(""+vertexBuffer.getInt(i*Integer.BYTES));
 //        }
-
         clearColor.rewind();
 
         // Run the rendering loop until the user has attempted to close
@@ -186,7 +183,7 @@ public class lwjgl {
 
             glClearColor(1.0f, 0.5f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-            
+
             GL30.glClearBufferfv(GL_COLOR, 0, clearColor);
 
             glfwSwapBuffers(window); // swap the color buffers
@@ -198,7 +195,7 @@ public class lwjgl {
             updateFPS();
         }
     }
-    
+
     FloatBuffer clearColor = BufferUtils.createFloatBuffer(4).put(new float[]{1.0f, 0.5f, 0.0f, 1.0f});
 
     public static void main(String[] args) {
