@@ -29,7 +29,6 @@ import com.jogamp.opengl.util.GLBuffers;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
 
 /**
  *
@@ -128,9 +127,9 @@ public class jogl implements GLEventListener, KeyListener {
                 gl4.glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.get(index));
                 vertexBufferGPUPtr.position(index);
                 gl4.glGetBufferParameterui64vNV(GL_ARRAY_BUFFER, GL_BUFFER_GPU_ADDRESS_NV, vertexBufferGPUPtr);
-//                vertexBufferSize.position(index);
-//                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize);
-//                gl4.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
+                vertexBufferSize.position(index);
+                gl4.glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, vertexBufferSize);
+                gl4.glMakeBufferResidentNV(GL_ARRAY_BUFFER, GL_READ_ONLY);
                 gl4.glBindBuffer(GL_ARRAY_BUFFER, 0);
 ////                // *** INTERESTING ***
 //                // get the GPU pointer for the index buffer and make the index buffer resident on the GPU
